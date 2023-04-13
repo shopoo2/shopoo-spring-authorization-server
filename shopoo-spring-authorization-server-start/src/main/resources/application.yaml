@@ -1,0 +1,11 @@
+logging:
+  level:
+#    org.springframework: trace
+    org.springframework.security: trace
+#    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: trace
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://www.szmengran.com:3306/oauth2
+    username: oauth2
+    password: Oauth2@123
