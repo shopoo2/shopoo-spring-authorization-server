@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
@@ -18,7 +19,7 @@ import java.security.Principal;
  * @author maoyuan.li
  * @since 2023-01-13
  */
-@Controller
+@RestController
 @RequestMapping("/oauth2")
 public class Oauth2AuthorizationController {
 
@@ -29,8 +30,7 @@ public class Oauth2AuthorizationController {
     }
     
     @GetMapping("/login")
-    public String login(Principal principal) {
-        System.out.println(principal.getName());
-        return "login";
+    public SingleResponse<String> login(Principal principal) {
+        return SingleResponse.of(principal.getName());
     }
 }

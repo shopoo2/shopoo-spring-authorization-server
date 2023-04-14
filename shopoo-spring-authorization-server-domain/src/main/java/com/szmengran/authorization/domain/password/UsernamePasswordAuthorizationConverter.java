@@ -2,6 +2,7 @@ package com.szmengran.authorization.domain.password;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -59,8 +60,8 @@ public class UsernamePasswordAuthorizationConverter implements AuthenticationCon
                 }
 
             });
-
-            return new OAuth2UsernamePasswordAuthenticationToken(clientPrincipal, requestedScopes, additionalParameters);
+    
+            return new OAuth2UsernamePasswordAuthenticationToken(clientPrincipal.getName(), clientPrincipal, requestedScopes, additionalParameters);
         }
     }
 }
