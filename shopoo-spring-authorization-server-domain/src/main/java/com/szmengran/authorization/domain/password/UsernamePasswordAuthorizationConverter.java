@@ -43,7 +43,7 @@ public class UsernamePasswordAuthorizationConverter implements AuthenticationCon
 
             Authentication clientPrincipal = SecurityContextHolder.getContext().getAuthentication();
             MultiValueMap<String, String> parameters = OAuth2EndpointUtils.getParameters(request);
-            String scope = (String)parameters.getFirst("scope");
+            String scope = parameters.getFirst("scope");
             if (StringUtils.hasText(scope) && ((List)parameters.get("scope")).size() != 1) {
                 OAuth2EndpointUtils.throwError("invalid_request", "scope", "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2");
             }

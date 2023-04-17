@@ -33,4 +33,9 @@ public class Oauth2AuthorizationController {
     public SingleResponse<String> login(Principal principal) {
         return SingleResponse.of(principal.getName());
     }
+    
+    @GetMapping("/test")
+    public SingleResponse<String> login() {
+        return SingleResponse.of("Hello World!");
+    }
 }
