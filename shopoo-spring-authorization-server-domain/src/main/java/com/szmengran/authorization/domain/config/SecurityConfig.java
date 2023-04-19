@@ -125,8 +125,8 @@ public class SecurityConfig {
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("messaging-client")
-                .clientSecret("$2a$10$8lA6h1bxK2.IUr8ptG.Oie/CogaoTe6/7tgvy0XrbSOqnnO9Nn3.6")
+                .clientId("shopoo")
+                .clientSecret("{noop}jksj83sjf02kjsfhlfsljsoiw39janxie")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)

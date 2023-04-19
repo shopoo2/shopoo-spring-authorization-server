@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -67,7 +66,7 @@ public class JwtConfig {
 	@Bean
 	public UserDetailsService userDetailsService() {
 		UserDetails userDetails = User.withUsername("user")
-				.password("$2a$10$pXo49T9saXibEngQdMIFB.tOAzkRMvvfgHLgF6a4W2mPAASa2IXNq")
+				.password("{bcrypt}$2a$10$pXo49T9saXibEngQdMIFB.tOAzkRMvvfgHLgF6a4W2mPAASa2IXNq")
 				.roles("USER")
 				.build();
 		
@@ -76,6 +75,6 @@ public class JwtConfig {
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 	}
 }
