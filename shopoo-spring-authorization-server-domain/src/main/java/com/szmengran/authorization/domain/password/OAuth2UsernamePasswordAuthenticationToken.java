@@ -1,66 +1,57 @@
 package com.szmengran.authorization.domain.password;
 
-import lombok.Getter;
-import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.util.SpringAuthorizationServerVersion;
 import org.springframework.util.Assert;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @Author MaoYuan.Li
  * @Date 2023/3/8 18:47
  * @Version 1.0
  */
-@Getter
 public class OAuth2UsernamePasswordAuthenticationToken extends AbstractAuthenticationToken {
     private static final long serialVersionUID;
-    private final String clientId;
-    private final Authentication principal;
-    private final Set<String> scopes;
+    private final RegisteredClient registeredClient;
+    private final Authentication clientPrincipal;
+    private final OAuth2AccessToken accessToken;
     private final Map<String, Object> additionalParameters;
     
-    public OAuth2UsernamePasswordAuthenticationToken(String clientId, Authentication principal, @Nullable Set<String> scopes, @Nullable Map<String, Object> additionalParameters) {
-        super(Collections.emptyList());
-        Assert.hasText(clientId, "clientId cannot be empty");
-        Assert.notNull(principal, "principal cannot be null");
-        this.clientId = clientId;
-        this.principal = principal;
-        this.scopes = Collections.unmodifiableSet((Set)(scopes != null ? new HashSet(scopes) : Collections.emptySet()));
-        this.additionalParameters = Collections.unmodifiableMap((Map)(additionalParameters != null ? new HashMap(additionalParameters) : Collections.emptyMap()));
+    public OAuth2UsernamePasswordAuthenticationToken(RegisteredClient registeredClient, Authentication clientPrincipal, OAuth2AccessToken accessToken) {
+        this(registeredClient, clientPrincipal, accessToken, Collections.emptyMap());
     }
     
-    public OAuth2UsernamePasswordAuthenticationToken(String clientId, Authentication principal, @Nullable Set<String> scopes) {
+    public OAuth2UsernamePasswordAuthenticationToken(RegisteredClient registeredClient, Authentication clientPrincipal, OAuth2AccessToken accessToken, Map<String, Object> additionalParameters) {
         super(Collections.emptyList());
-        Assert.hasText(clientId, "clientId cannot be empty");
-        Assert.notNull(principal, "principal cannot be null");
-        this.clientId = clientId;
-        this.principal = principal;
-        this.scopes = Collections.unmodifiableSet((Set)(scopes != null ? new HashSet(scopes) : Collections.emptySet()));
-        this.additionalParameters = Collections.emptyMap();
-        this.setAuthenticated(true);
+        Assert.notNull(registeredClient, "registeredClient cannot be null");
+        Assert.notNull(clientPrincipal, "clientPrincipal cannot be null");
+        Assert.notNull(accessToken, "accessToken cannot be null");
+        Assert.notNull(additionalParameters, "additionalParameters cannot be null");
+        this.registeredClient = registeredClient;
+        this.clientPrincipal = clientPrincipal;
+        this.accessToken = accessToken;
+        this.additionalParameters = additionalParameters;
     }
     
     public Object getPrincipal() {
-        return this.principal;
+        return this.clientPrincipal;
     }
     
     public Object getCredentials() {
         return "";
     }
     
-    public String getClientId() {
-        return this.clientId;
+    public RegisteredClient getRegisteredClient() {
+        return this.registeredClient;
     }
     
-    public Set<String> getScopes() {
-        return this.scopes;
+    public OAuth2AccessToken getAccessToken() {
+        return this.accessToken;
     }
     
     public Map<String, Object> getAdditionalParameters() {
@@ -70,5 +61,4 @@ public class OAuth2UsernamePasswordAuthenticationToken extends AbstractAuthentic
     static {
         serialVersionUID = SpringAuthorizationServerVersion.SERIAL_VERSION_UID;
     }
-
 }

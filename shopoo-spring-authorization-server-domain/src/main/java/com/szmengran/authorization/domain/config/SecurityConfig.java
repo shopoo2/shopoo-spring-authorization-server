@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2Token;
@@ -26,6 +27,7 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,7 +35,12 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author MaoYuan.Li
@@ -45,6 +52,12 @@ public class SecurityConfig {
     
     @Resource
     private JwtDecoder jwtDecoder;
+    
+    @Resource
+    private UserDetailsService userDetailsService;
+    
+    @Resource
+    private PasswordEncoder passwordEncoder;
     
     @Bean
     @Order(1)
@@ -58,15 +71,32 @@ public class SecurityConfig {
                 )
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .apply(authorizationServerConfigurer);
-        
+//        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
+//        RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
+//        http.csrf().disable().securityMatcher(endpointsMatcher).authorizeHttpRequests((authorize) -> {
+//            ((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)authorize.anyRequest()).authenticated();
+//        }).apply(authorizationServerConfigurer);
+//
+//        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+//                .oidc(Customizer.withDefaults());	// Enable OpenID Connect 1.0
+//        http
+//                // Redirect to the login page when not authenticated from the
+//                // authorization endpoint
+//                .exceptionHandling((exceptions) -> exceptions
+//                        .authenticationEntryPoint(
+//                                new LoginUrlAuthenticationEntryPoint("/login"))
+//                )
+//                // Accept access tokens for User Info and/or Client Registration
+//                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
         
         OAuth2AuthorizationService authorizationService = OAuth2ConfigurerUtils.getAuthorizationService(http);
         OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator = OAuth2ConfigurerUtils.getTokenGenerator(http);
+    
         authorizationServerConfigurer.tokenEndpoint(tokenEndpoint  ->
                         tokenEndpoint
                                 .accessTokenRequestConverter(new UsernamePasswordAuthorizationConverter())
                                 //                                .authorizationRequestConverters(authorizationRequestConvertersConsumer)
-                                .authenticationProvider(new UsernamePasswordAuthenticationProvider(authorizationService, tokenGenerator))
+                                .authenticationProvider(new UsernamePasswordAuthenticationProvider(passwordEncoder, userDetailsService, authorizationService, tokenGenerator))
                 //                                .authenticationProviders(authenticationProvidersConsumer)
                 //                                .authorizationResponseHandler(authorizationResponseHandler)
                 //                                .errorResponseHandler(errorResponseHandler)
@@ -91,22 +121,12 @@ public class SecurityConfig {
         return http.build();
     }
     
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build();
-        
-        return new InMemoryUserDetailsManager(userDetails);
-    }
     
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("messaging-client")
-                .clientSecret("{noop}secret")
+                .clientSecret("$2a$10$8lA6h1bxK2.IUr8ptG.Oie/CogaoTe6/7tgvy0XrbSOqnnO9Nn3.6")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
@@ -117,7 +137,9 @@ public class SecurityConfig {
                 .scope(OidcScopes.PROFILE)
                 .scope("message.read")
                 .scope("message.write")
+                .scope("shopoo")
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+                .tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.of(14, ChronoUnit.DAYS)).build())
                 .build();
         
         return new InMemoryRegisteredClientRepository(registeredClient);

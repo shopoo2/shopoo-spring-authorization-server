@@ -24,18 +24,15 @@ import java.util.Set;
  */
 public class UsernamePasswordAuthorizationConverter implements AuthenticationConverter {
 
-    private static final String USERNAME_KEY = "username";
-    private static final String PASSWORD_KEY = "password";
-    private static final String GRANT_TYPE = "grant_type";
 
     @Override
     public Authentication convert(final HttpServletRequest request) {
-        String grantType = request.getParameter(GRANT_TYPE);
-        if (!AuthorizationGrantType.PASSWORD.getValue().equals(grantType)) {
+        String grantType = request.getParameter(Constants.GRANT_TYPE);
+        if (!Constants.PASSWORD_AUTHORIZATION_GRANT_TYPE.equals(grantType)) {
             return null;
         } else {
-            String username = request.getParameter(USERNAME_KEY);
-            String password = request.getParameter(PASSWORD_KEY);
+            String username = request.getParameter(Constants.USERNAME_KEY);
+            String password = request.getParameter(Constants.PASSWORD_KEY);
 
             if (!StringUtils.hasText(username) || !StringUtils.hasText(password)) {
                 throw new BadCredentialsException("Invalid username or password");
@@ -43,9 +40,9 @@ public class UsernamePasswordAuthorizationConverter implements AuthenticationCon
 
             Authentication clientPrincipal = SecurityContextHolder.getContext().getAuthentication();
             MultiValueMap<String, String> parameters = OAuth2EndpointUtils.getParameters(request);
-            String scope = parameters.getFirst("scope");
-            if (StringUtils.hasText(scope) && ((List)parameters.get("scope")).size() != 1) {
-                OAuth2EndpointUtils.throwError("invalid_request", "scope", "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2");
+            String scope = parameters.getFirst(Constants.SCOPE);
+            if (StringUtils.hasText(scope) && ((List)parameters.get(Constants.SCOPE)).size() != 1) {
+                OAuth2EndpointUtils.throwError("invalid_request", Constants.SCOPE, "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2");
             }
 
             Set<String> requestedScopes = null;
@@ -55,13 +52,13 @@ public class UsernamePasswordAuthorizationConverter implements AuthenticationCon
 
             Map<String, Object> additionalParameters = new HashMap();
             parameters.forEach((key, value) -> {
-                if (!key.equals("grant_type") && !key.equals("scope")) {
+                if (!key.equals("grant_type") && !key.equals(Constants.SCOPE)) {
                     additionalParameters.put(key, value.get(0));
                 }
 
             });
     
-            return new OAuth2UsernamePasswordAuthenticationToken(clientPrincipal.getName(), clientPrincipal, requestedScopes, additionalParameters);
+            return new CustomerUsernamePasswordAuthenticationToken(clientPrincipal, requestedScopes, additionalParameters);
         }
     }
 }
