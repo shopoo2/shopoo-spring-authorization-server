@@ -1,7 +1,6 @@
 package com.szmengran.authorization.domain.password;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.util.LinkedMultiValueMap;
@@ -59,7 +58,7 @@ public class OAuth2EndpointUtils {
     }
 
     static boolean matchesAuthorizationCodeGrantRequest(HttpServletRequest request) {
-        return AuthorizationGrantType.PASSWORD.getValue().equals(request.getParameter("grant_type"));
+        return Constants.PASSWORD_AUTHORIZATION_GRANT_TYPE.equals(request.getParameter("grant_type"));
     }
 
     static void throwError(String errorCode, String parameterName, String errorUri) {
