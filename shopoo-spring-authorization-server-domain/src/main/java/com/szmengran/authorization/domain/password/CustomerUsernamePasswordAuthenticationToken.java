@@ -3,6 +3,7 @@ package com.szmengran.authorization.domain.password;
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.server.authorization.util.SpringAuthorizationServerVersion;
 import org.springframework.util.Assert;
 
@@ -17,6 +18,7 @@ import java.util.Set;
  */
 public class CustomerUsernamePasswordAuthenticationToken extends AbstractAuthenticationToken {
     private static final long serialVersionUID;
+    public static final AuthorizationGrantType GRANT_TYPE = new AuthorizationGrantType("password");
     
     @Getter
     private final Authentication clientPrincipal;

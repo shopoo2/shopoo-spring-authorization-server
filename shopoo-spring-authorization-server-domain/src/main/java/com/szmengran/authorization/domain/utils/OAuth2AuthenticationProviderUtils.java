@@ -1,4 +1,4 @@
-package com.szmengran.authorization.domain.password;
+package com.szmengran.authorization.domain.utils;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -20,7 +20,7 @@ public class OAuth2AuthenticationProviderUtils {
     private OAuth2AuthenticationProviderUtils() {
     }
 
-    static OAuth2ClientAuthenticationToken getAuthenticatedClientElseThrowInvalidClient(Authentication authentication) {
+    public static OAuth2ClientAuthenticationToken getAuthenticatedClientElseThrowInvalidClient(Authentication authentication) {
         OAuth2ClientAuthenticationToken clientPrincipal = null;
         if (OAuth2ClientAuthenticationToken.class.isAssignableFrom(authentication.getPrincipal().getClass())) {
             clientPrincipal = (OAuth2ClientAuthenticationToken)authentication.getPrincipal();
@@ -32,8 +32,8 @@ public class OAuth2AuthenticationProviderUtils {
             throw new OAuth2AuthenticationException("invalid_client");
         }
     }
-
-    static <T extends OAuth2Token> OAuth2Authorization invalidate(OAuth2Authorization authorization, T token) {
+    
+    public static <T extends OAuth2Token> OAuth2Authorization invalidate(OAuth2Authorization authorization, T token) {
         OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.from(authorization).token(token, (metadata) -> {
             metadata.put(Token.INVALIDATED_METADATA_NAME, true);
         });

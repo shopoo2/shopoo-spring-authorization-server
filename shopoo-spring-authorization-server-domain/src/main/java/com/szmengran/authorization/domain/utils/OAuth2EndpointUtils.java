@@ -1,5 +1,7 @@
-package com.szmengran.authorization.domain.password;
+package com.szmengran.authorization.domain.utils;
 
+import com.szmengran.authorization.domain.password.CustomerUsernamePasswordAuthenticationToken;
+import com.szmengran.authorization.domain.utils.Constants;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
@@ -22,7 +24,7 @@ public class OAuth2EndpointUtils {
     private OAuth2EndpointUtils() {
     }
 
-    static MultiValueMap<String, String> getParameters(HttpServletRequest request) {
+    public static MultiValueMap<String, String> getParameters(HttpServletRequest request) {
         Map<String, String[]> parameterMap = request.getParameterMap();
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap(parameterMap.size());
         parameterMap.forEach((key, values) -> {
@@ -39,8 +41,8 @@ public class OAuth2EndpointUtils {
         });
         return parameters;
     }
-
-    static Map<String, Object> getParametersIfMatchesAuthorizationPasswordGrantRequest(HttpServletRequest request, String... exclusions) {
+    
+    public static Map<String, Object> getParametersIfMatchesAuthorizationPasswordGrantRequest(HttpServletRequest request, String... exclusions) {
         if (!matchesAuthorizationCodeGrantRequest(request)) {
             return Collections.emptyMap();
         } else {
@@ -56,12 +58,12 @@ public class OAuth2EndpointUtils {
             return parameters;
         }
     }
-
-    static boolean matchesAuthorizationCodeGrantRequest(HttpServletRequest request) {
-        return Constants.PASSWORD_AUTHORIZATION_GRANT_TYPE.equals(request.getParameter("grant_type"));
+    
+    public static boolean matchesAuthorizationCodeGrantRequest(HttpServletRequest request) {
+        return CustomerUsernamePasswordAuthenticationToken.GRANT_TYPE.getValue().equals(request.getParameter(Constants.GRANT_TYPE_KEY));
     }
-
-    static void throwError(String errorCode, String parameterName, String errorUri) {
+    
+    public static void throwError(String errorCode, String parameterName, String errorUri) {
         OAuth2Error error = new OAuth2Error(errorCode, "OAuth 2.0 Parameter: " + parameterName, errorUri);
         throw new OAuth2AuthenticationException(error);
     }

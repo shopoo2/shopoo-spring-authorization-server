@@ -1,11 +1,22 @@
-logging:
-  level:
-#    org.springframework: trace
-    org.springframework.security: trace
-#    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: trace
+server:
+  port: 8080
 spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://www.szmengran.com:3306/oauth2
-    username: oauth2
-    password: Oauth2@123
+  profiles:
+    active: ${ENVIRONMENT:dev}
+  application:
+    name: shopoo-spring-authorization-server-start
+  cloud:
+    nacos:
+      username: ${NACOS_USERNAME}
+      password: ${NACOS_PASSWORD}
+      discovery:
+        namespace: szmengran-${spring.profiles.active}
+        server-addr: ${NACOS_SERVER_ADDRESS}
+      config:
+        namespace: szmengran-${spring.profiles.active}
+        server-addr: ${NACOS_SERVER_ADDRESS}
+  config:
+    import:
+      - nacos:knife4j.yaml
+      - nacos:wechat.yaml
+      - nacos:shopoo-spring-authorization-server-start.yaml

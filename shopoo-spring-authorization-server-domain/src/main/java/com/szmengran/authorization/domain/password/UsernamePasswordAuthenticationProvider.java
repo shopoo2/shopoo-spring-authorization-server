@@ -1,5 +1,7 @@
 package com.szmengran.authorization.domain.password;
 
+import com.szmengran.authorization.domain.utils.Constants;
+import com.szmengran.authorization.domain.utils.OAuth2AuthenticationProviderUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -90,7 +92,7 @@ public class UsernamePasswordAuthenticationProvider extends AbstractUserDetailsA
         super.authenticate(usernamePasswordAuthenticationToken);
         OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils.getAuthenticatedClientElseThrowInvalidClient(customerUsernamePasswordAuthenticationToken);
         RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
-        DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder().registeredClient(registeredClient).principal(usernamePasswordAuthenticationToken).authorizationServerContext(AuthorizationServerContextHolder.getContext()).authorizedScopes(customerUsernamePasswordAuthenticationToken.getScopes()).authorizationGrantType(AuthorizationGrantType.PASSWORD);
+        DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder().registeredClient(registeredClient).principal(usernamePasswordAuthenticationToken).authorizationServerContext(AuthorizationServerContextHolder.getContext()).authorizedScopes(customerUsernamePasswordAuthenticationToken.getScopes()).authorizationGrantType(CustomerUsernamePasswordAuthenticationToken.GRANT_TYPE);
         OAuth2TokenContext tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.ACCESS_TOKEN).build();
         OAuth2Token generatedAccessToken = this.tokenGenerator.generate(tokenContext);
         OAuth2AccessToken accessToken = new OAuth2AccessToken(TokenType.BEARER, generatedAccessToken.getTokenValue(), generatedAccessToken.getIssuedAt(), generatedAccessToken.getExpiresAt(), tokenContext.getAuthorizedScopes());

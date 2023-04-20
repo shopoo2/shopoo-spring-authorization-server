@@ -64,16 +64,6 @@ public class JwtConfig {
 	}
 	
 	@Bean
-	public UserDetailsService userDetailsService() {
-		UserDetails userDetails = User.withUsername("user")
-				.password("{bcrypt}$2a$10$pXo49T9saXibEngQdMIFB.tOAzkRMvvfgHLgF6a4W2mPAASa2IXNq")
-				.roles("USER")
-				.build();
-		
-		return new InMemoryUserDetailsManager(userDetails);
-	}
-	
-	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 	}

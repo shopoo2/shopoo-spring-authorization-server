@@ -1,11 +1,11 @@
 package com.szmengran.authorization.domain.password;
 
+import com.szmengran.authorization.domain.utils.Constants;
+import com.szmengran.authorization.domain.utils.OAuth2EndpointUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -27,8 +27,8 @@ public class UsernamePasswordAuthorizationConverter implements AuthenticationCon
 
     @Override
     public Authentication convert(final HttpServletRequest request) {
-        String grantType = request.getParameter(Constants.GRANT_TYPE);
-        if (!Constants.PASSWORD_AUTHORIZATION_GRANT_TYPE.equals(grantType)) {
+        String grantType = request.getParameter(Constants.GRANT_TYPE_KEY);
+        if (!CustomerUsernamePasswordAuthenticationToken.GRANT_TYPE.getValue().equals(grantType)) {
             return null;
         } else {
             String username = request.getParameter(Constants.USERNAME_KEY);
@@ -40,9 +40,9 @@ public class UsernamePasswordAuthorizationConverter implements AuthenticationCon
 
             Authentication clientPrincipal = SecurityContextHolder.getContext().getAuthentication();
             MultiValueMap<String, String> parameters = OAuth2EndpointUtils.getParameters(request);
-            String scope = parameters.getFirst(Constants.SCOPE);
-            if (StringUtils.hasText(scope) && ((List)parameters.get(Constants.SCOPE)).size() != 1) {
-                OAuth2EndpointUtils.throwError("invalid_request", Constants.SCOPE, "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2");
+            String scope = parameters.getFirst(Constants.SCOPE_KEY);
+            if (StringUtils.hasText(scope) && ((List)parameters.get(Constants.SCOPE_KEY)).size() != 1) {
+                OAuth2EndpointUtils.throwError("invalid_request", Constants.SCOPE_KEY, "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2");
             }
 
             Set<String> requestedScopes = null;
@@ -52,7 +52,7 @@ public class UsernamePasswordAuthorizationConverter implements AuthenticationCon
 
             Map<String, Object> additionalParameters = new HashMap();
             parameters.forEach((key, value) -> {
-                if (!key.equals("grant_type") && !key.equals(Constants.SCOPE)) {
+                if (!key.equals(Constants.GRANT_TYPE_KEY) && !key.equals(Constants.SCOPE_KEY)) {
                     additionalParameters.put(key, value.get(0));
                 }
 

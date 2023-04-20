@@ -2,10 +2,16 @@ package com.szmengran.authorization.domain.config;
 
 import com.szmengran.authorization.domain.password.UsernamePasswordAuthenticationProvider;
 import com.szmengran.authorization.domain.password.UsernamePasswordAuthorizationConverter;
+import com.szmengran.authorization.domain.wechat.config.WechatProperties;
+import com.szmengran.authorization.domain.wechat.miniprogram.MiniProgramAuthenticationProvider;
+import com.szmengran.authorization.domain.wechat.miniprogram.MiniProgramAuthorizationConverter;
+import com.szmengran.authorization.domain.wechat.miniprogram.MiniProgramAuthorizationToken;
+import com.szmengran.authorization.domain.wechat.repository.MiniProgramRepository;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -21,6 +27,7 @@ import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -51,6 +58,9 @@ import java.util.concurrent.TimeUnit;
 public class SecurityConfig {
     
     @Resource
+    private JdbcTemplate jdbcTemplate;
+    
+    @Resource
     private JwtDecoder jwtDecoder;
     
     @Resource
@@ -58,6 +68,12 @@ public class SecurityConfig {
     
     @Resource
     private PasswordEncoder passwordEncoder;
+    
+    @Resource
+    private WechatProperties wechatProperties;
+    
+    @Resource
+    private MiniProgramRepository miniProgramRepository;
     
     @Bean
     @Order(1)
@@ -95,8 +111,10 @@ public class SecurityConfig {
         authorizationServerConfigurer.tokenEndpoint(tokenEndpoint  ->
                         tokenEndpoint
                                 .accessTokenRequestConverter(new UsernamePasswordAuthorizationConverter())
+                                .accessTokenRequestConverter(new MiniProgramAuthorizationConverter())
                                 //                                .authorizationRequestConverters(authorizationRequestConvertersConsumer)
                                 .authenticationProvider(new UsernamePasswordAuthenticationProvider(passwordEncoder, userDetailsService, authorizationService, tokenGenerator))
+                                .authenticationProvider(new MiniProgramAuthenticationProvider(wechatProperties, miniProgramRepository, tokenGenerator))
                 //                                .authenticationProviders(authenticationProvidersConsumer)
                 //                                .authorizationResponseHandler(authorizationResponseHandler)
                 //                                .errorResponseHandler(errorResponseHandler)
@@ -121,28 +139,26 @@ public class SecurityConfig {
         return http.build();
     }
     
-    
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
-        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("shopoo")
-                .clientSecret("{noop}jksj83sjf02kjsfhlfsljsoiw39janxie")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
-                .redirectUri("http://127.0.0.1:8080/authorized")
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
-                .scope("message.read")
-                .scope("message.write")
-                .scope("shopoo")
-                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-                .tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.of(14, ChronoUnit.DAYS)).build())
-                .build();
-        
-        return new InMemoryRegisteredClientRepository(registeredClient);
+//        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//                .clientId("shopoo")
+//                .clientSecret("{noop}jksj83sjf02kjsfhlfsljsoiw39janxie")
+//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+//                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
+//                .redirectUri("http://127.0.0.1:8080/authorized")
+//                .scope(OidcScopes.OPENID)
+//                .scope(OidcScopes.PROFILE)
+//                .scope("message.read")
+//                .scope("message.write")
+//                .scope("shopoo")
+//                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+//                .tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.of(14, ChronoUnit.DAYS)).build())
+//                .build();
+        return new JdbcRegisteredClientRepository(jdbcTemplate);
     }
     
     @Bean
