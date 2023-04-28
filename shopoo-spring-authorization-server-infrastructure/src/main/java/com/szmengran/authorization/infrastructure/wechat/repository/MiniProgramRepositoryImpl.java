@@ -1,13 +1,13 @@
 package com.szmengran.authorization.infrastructure.wechat.repository;
 
-import com.nimbusds.jose.shaded.gson.Gson;
+import com.shopoo.wechat.api.WechatFacade;
+import com.shopoo.wechat.dto.clientobject.LoginInfoCO;
+import com.shopoo.wechat.dto.cqe.LoginCmd;
 import com.szmengran.authorization.domain.wechat.repository.MiniProgramRepository;
-import com.szmengran.authorization.dto.WechatMiniProgramCO;
 import com.szmengran.authorization.dto.cqe.WechatMiniProgramQuery;
-import com.szmengran.authorization.infrastructure.wechat.client.MiniProgramClient;
-import com.szmengran.cola.exception.Assert;
+import com.szmengran.cola.dto.SingleResponse;
 import com.szmengran.cola.exception.SysException;
-import jakarta.annotation.Resource;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -18,16 +18,16 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class MiniProgramRepositoryImpl implements MiniProgramRepository {
     
-    @Resource
-    private MiniProgramClient miniProgramClient;
+    @DubboReference
+    private WechatFacade wechatFacade;
     
     @Override
-    public WechatMiniProgramCO jscode2session(final WechatMiniProgramQuery wechatMiniProgramQuery) {
-        String json = miniProgramClient.jscode2session(wechatMiniProgramQuery.getAppid(), wechatMiniProgramQuery.getSecret(), wechatMiniProgramQuery.getJsCode());
-        WechatMiniProgramCO wechatMiniProgramCO = new Gson().fromJson(json, WechatMiniProgramCO.class);
-        if (wechatMiniProgramCO.getErrcode() != 0) {
-            throw new SysException(String.valueOf(wechatMiniProgramCO.getErrcode()), wechatMiniProgramCO.getErrmsg());
+    public LoginInfoCO login(final WechatMiniProgramQuery wechatMiniProgramQuery) {
+        LoginCmd loginCmd = LoginCmd.builder().appId(wechatMiniProgramQuery.getAppid()).appSecret(wechatMiniProgramQuery.getSecret()).code(wechatMiniProgramQuery.getJsCode()).build();
+        SingleResponse<LoginInfoCO> response = wechatFacade.getLoginInfo(loginCmd);
+        if (!response.isSuccess()) {
+            throw new SysException(response.getErrCode(), response.getErrMessage());
         }
-        return wechatMiniProgramCO;
+        return response.getData();
     }
 }

@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8088
 spring:
   profiles:
     active: ${ENVIRONMENT:dev}
@@ -10,7 +10,7 @@ spring:
       username: ${NACOS_USERNAME}
       password: ${NACOS_PASSWORD}
       discovery:
-        namespace: szmengran-${spring.profiles.active}
+        namespace: shopoo-${spring.profiles.active}
         server-addr: ${NACOS_SERVER_ADDRESS}
       config:
         namespace: szmengran-${spring.profiles.active}

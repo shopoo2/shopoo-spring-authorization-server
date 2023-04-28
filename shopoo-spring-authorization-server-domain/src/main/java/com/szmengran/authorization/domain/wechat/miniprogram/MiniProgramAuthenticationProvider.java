@@ -47,12 +47,12 @@ public class MiniProgramAuthenticationProvider implements AuthenticationProvider
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         MiniProgramAuthorizationToken miniProgramAuthorizationToken = (MiniProgramAuthorizationToken) authentication;
-        String appid = miniProgramAuthorizationToken.getAppid();
-        Assert.notNull(appid, "appid cannot be null");
-        String secret = wechatProperties.getMiniProgram().getMap().get(appid);
-        Assert.notNull(secret, String.format("can't found secret(appid: %s) from map", appid));
-        WechatMiniProgramQuery wechatMiniProgramQuery = WechatMiniProgramQuery.builder().appid(appid).secret(secret).jsCode(miniProgramAuthorizationToken.getCode()).grantType("authorization_code").build();
-        WechatMiniProgramCO wechatMiniProgramCO = miniProgramRepository.jscode2session(wechatMiniProgramQuery);
+        String appId = miniProgramAuthorizationToken.getAppid();
+        Assert.notNull(appId, "appId cannot be null");
+        String secret = wechatProperties.getMiniProgram().getMap().get(appId);
+        Assert.notNull(secret, String.format("can't found secret(appid: %s) from map", appId));
+        WechatMiniProgramQuery wechatMiniProgramQuery = WechatMiniProgramQuery.builder().appid(appId).secret(secret).jsCode(miniProgramAuthorizationToken.getCode()).grantType("authorization_code").build();
+        miniProgramRepository.login(wechatMiniProgramQuery);
     
         OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils.getAuthenticatedClientElseThrowInvalidClient(miniProgramAuthorizationToken);
         RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();

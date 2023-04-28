@@ -1,5 +1,6 @@
 package com.szmengran.authorization.domain.wechat.repository;
 
+import com.shopoo.wechat.dto.clientobject.LoginInfoCO;
 import com.szmengran.authorization.dto.WechatMiniProgramCO;
 import com.szmengran.authorization.dto.cqe.WechatMiniProgramQuery;
 
@@ -13,9 +14,9 @@ public interface MiniProgramRepository {
     /** 
      * @description: 获取微信小程序登录信息
      * @param wechatMiniProgramQuery 
-     * @return: com.szmengran.authorization.dto.WechatMiniProgramCO 
+     * @return: com.shopoo.wechat.dto.clientobject.LoginInfoCO 
      * @author MaoYuan.Li
-     * @date: 2023/4/19 19:52
+     * @date: 2023/4/26 19:09
      */
-    WechatMiniProgramCO jscode2session(WechatMiniProgramQuery wechatMiniProgramQuery);
+    LoginInfoCO login(WechatMiniProgramQuery wechatMiniProgramQuery);
 }
