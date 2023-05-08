@@ -20,7 +20,7 @@ import lombok.ToString;
 @ToString
 public class WechatMiniProgramQuery extends Query {
     
-    private String appid;
+    private String appId;
     
     private String secret;
     

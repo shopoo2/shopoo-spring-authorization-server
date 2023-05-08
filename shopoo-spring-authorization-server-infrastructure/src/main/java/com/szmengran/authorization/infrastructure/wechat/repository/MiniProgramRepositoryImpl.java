@@ -23,7 +23,7 @@ public class MiniProgramRepositoryImpl implements MiniProgramRepository {
     
     @Override
     public LoginInfoCO login(final WechatMiniProgramQuery wechatMiniProgramQuery) {
-        LoginCmd loginCmd = LoginCmd.builder().appId(wechatMiniProgramQuery.getAppid()).appSecret(wechatMiniProgramQuery.getSecret()).code(wechatMiniProgramQuery.getJsCode()).build();
+        LoginCmd loginCmd = LoginCmd.builder().appId(wechatMiniProgramQuery.getAppId()).appSecret(wechatMiniProgramQuery.getSecret()).code(wechatMiniProgramQuery.getJsCode()).build();
         SingleResponse<LoginInfoCO> response = wechatFacade.getLoginInfo(loginCmd);
         if (!response.isSuccess()) {
             throw new SysException(response.getErrCode(), response.getErrMessage());

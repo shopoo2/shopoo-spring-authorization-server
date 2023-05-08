@@ -32,6 +32,8 @@ import org.springframework.util.Assert;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * @Author MaoYuan.Li
@@ -92,7 +94,8 @@ public class UsernamePasswordAuthenticationProvider extends AbstractUserDetailsA
         super.authenticate(usernamePasswordAuthenticationToken);
         OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils.getAuthenticatedClientElseThrowInvalidClient(customerUsernamePasswordAuthenticationToken);
         RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
-        DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder().registeredClient(registeredClient).principal(usernamePasswordAuthenticationToken).authorizationServerContext(AuthorizationServerContextHolder.getContext()).authorizedScopes(customerUsernamePasswordAuthenticationToken.getScopes()).authorizationGrantType(CustomerUsernamePasswordAuthenticationToken.GRANT_TYPE);
+        Set<String> scopes = Optional.ofNullable(customerUsernamePasswordAuthenticationToken.getScopes()).orElse(registeredClient.getScopes());
+        DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder().registeredClient(registeredClient).principal(usernamePasswordAuthenticationToken).authorizationServerContext(AuthorizationServerContextHolder.getContext()).authorizedScopes(scopes).authorizationGrantType(CustomerUsernamePasswordAuthenticationToken.GRANT_TYPE);
         OAuth2TokenContext tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.ACCESS_TOKEN).build();
         OAuth2Token generatedAccessToken = this.tokenGenerator.generate(tokenContext);
         OAuth2AccessToken accessToken = new OAuth2AccessToken(TokenType.BEARER, generatedAccessToken.getTokenValue(), generatedAccessToken.getIssuedAt(), generatedAccessToken.getExpiresAt(), tokenContext.getAuthorizedScopes());

@@ -10,13 +10,14 @@ spring:
       username: ${NACOS_USERNAME}
       password: ${NACOS_PASSWORD}
       discovery:
-        namespace: shopoo-${spring.profiles.active}
+        namespace: szmengran-${spring.profiles.active}
         server-addr: ${NACOS_SERVER_ADDRESS}
       config:
         namespace: szmengran-${spring.profiles.active}
         server-addr: ${NACOS_SERVER_ADDRESS}
   config:
     import:
+      - nacos:szmengran-common-dubbo.yaml
       - nacos:knife4j.yaml
       - nacos:wechat.yaml
       - nacos:shopoo-spring-authorization-server-start.yaml

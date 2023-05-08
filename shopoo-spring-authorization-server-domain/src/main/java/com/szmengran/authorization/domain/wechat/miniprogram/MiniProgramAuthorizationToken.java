@@ -32,7 +32,7 @@ public class MiniProgramAuthorizationToken extends AbstractAuthenticationToken {
      * AppID(小程序ID)
      */
     @Getter
-    private final String appid;
+    private final String appId;
     
     /**
      * @see <a href=
@@ -46,12 +46,12 @@ public class MiniProgramAuthorizationToken extends AbstractAuthenticationToken {
     private final Set<String> scopes;
     private final Map<String, Object> additionalParameters;
     
-    public MiniProgramAuthorizationToken(String appid, String code, Set<String> scopes, Map<String, Object> additionalParameters) {
+    public MiniProgramAuthorizationToken(String appId, String code, Set<String> scopes, Map<String, Object> additionalParameters) {
         super(Collections.emptyList());
-        Assert.notNull(appid, "appid cannot be null");
+        Assert.notNull(appId, "appId cannot be null");
         Assert.notNull(code, "wechat authorization_code cannot be null");
         Assert.notNull(additionalParameters, "additionalParameters cannot be null");
-        this.appid = appid;
+        this.appId = appId;
         this.code = code;
         this.scopes = scopes;
         this.additionalParameters = additionalParameters;

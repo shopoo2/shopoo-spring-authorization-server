@@ -12,7 +12,7 @@ public interface WechatMiniProgramConstants {
     /**
      * AppID(小程序ID)
      */
-    public static final String APPID = "appid";
+    public static final String APPID = "appId";
     
     /**
      * AppSecret(小程序密钥)

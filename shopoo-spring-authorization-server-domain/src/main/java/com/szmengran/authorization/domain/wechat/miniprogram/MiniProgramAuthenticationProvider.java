@@ -3,12 +3,10 @@ package com.szmengran.authorization.domain.wechat.miniprogram;
 import com.szmengran.authorization.domain.utils.OAuth2AuthenticationProviderUtils;
 import com.szmengran.authorization.domain.wechat.config.WechatProperties;
 import com.szmengran.authorization.domain.wechat.repository.MiniProgramRepository;
-import com.szmengran.authorization.dto.WechatMiniProgramCO;
 import com.szmengran.authorization.dto.cqe.WechatMiniProgramQuery;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType;
 import org.springframework.security.oauth2.core.OAuth2Token;
@@ -23,6 +21,8 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.util.Assert;
 
 import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * @Author MaoYuan.Li
@@ -47,16 +47,17 @@ public class MiniProgramAuthenticationProvider implements AuthenticationProvider
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         MiniProgramAuthorizationToken miniProgramAuthorizationToken = (MiniProgramAuthorizationToken) authentication;
-        String appId = miniProgramAuthorizationToken.getAppid();
+        String appId = miniProgramAuthorizationToken.getAppId();
         Assert.notNull(appId, "appId cannot be null");
         String secret = wechatProperties.getMiniProgram().getMap().get(appId);
-        Assert.notNull(secret, String.format("can't found secret(appid: %s) from map", appId));
-        WechatMiniProgramQuery wechatMiniProgramQuery = WechatMiniProgramQuery.builder().appid(appId).secret(secret).jsCode(miniProgramAuthorizationToken.getCode()).grantType("authorization_code").build();
+        Assert.notNull(secret, String.format("can't found secret(appId: %s) from map", appId));
+        WechatMiniProgramQuery wechatMiniProgramQuery = WechatMiniProgramQuery.builder().appId(appId).secret(secret).jsCode(miniProgramAuthorizationToken.getCode()).grantType("authorization_code").build();
         miniProgramRepository.login(wechatMiniProgramQuery);
     
         OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils.getAuthenticatedClientElseThrowInvalidClient(miniProgramAuthorizationToken);
         RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
-        DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder().registeredClient(registeredClient).principal(miniProgramAuthorizationToken).authorizationServerContext(AuthorizationServerContextHolder.getContext()).authorizedScopes(miniProgramAuthorizationToken.getScopes()).authorizationGrantType(MiniProgramAuthorizationToken.GRANT_TYPE);
+        Set<String> scopes = Optional.ofNullable(miniProgramAuthorizationToken.getScopes()).orElse(registeredClient.getScopes());
+        DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder().registeredClient(registeredClient).principal(miniProgramAuthorizationToken).authorizationServerContext(AuthorizationServerContextHolder.getContext()).authorizedScopes(scopes).authorizationGrantType(MiniProgramAuthorizationToken.GRANT_TYPE);
         OAuth2TokenContext tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.ACCESS_TOKEN).build();
         OAuth2Token generatedAccessToken = this.tokenGenerator.generate(tokenContext);
         OAuth2AccessToken accessToken = new OAuth2AccessToken(TokenType.BEARER, generatedAccessToken.getTokenValue(), generatedAccessToken.getIssuedAt(), generatedAccessToken.getExpiresAt(), tokenContext.getAuthorizedScopes());

@@ -15,7 +15,5 @@ public class WechatMiniProgramCO {
     @JsonProperty
     private String sessionKey;
     private String unionid;
-    private Integer errcode;
-    private String errmsg;
     
 }

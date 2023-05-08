@@ -31,7 +31,7 @@ public class MiniProgramAuthorizationConverter implements AuthenticationConverte
             return null;
         }
         String code = request.getParameter(WechatMiniProgramConstants.JS_CODE);
-        String appid = request.getParameter(WechatMiniProgramConstants.APPID);
+        String appId = request.getParameter(WechatMiniProgramConstants.APPID);
     
         if (!StringUtils.hasText(code)) {
             throw new BadCredentialsException("Invalid wechat authorization_code");
@@ -57,6 +57,6 @@ public class MiniProgramAuthorizationConverter implements AuthenticationConverte
         
         });
     
-        return new MiniProgramAuthorizationToken(appid, code, scopes, additionalParameters);
+        return new MiniProgramAuthorizationToken(appId, code, scopes, additionalParameters);
     }
 }
