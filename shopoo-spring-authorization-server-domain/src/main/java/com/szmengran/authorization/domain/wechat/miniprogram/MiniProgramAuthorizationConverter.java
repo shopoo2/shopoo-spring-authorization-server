@@ -30,7 +30,7 @@ public class MiniProgramAuthorizationConverter implements AuthenticationConverte
         if (!MiniProgramAuthorizationToken.GRANT_TYPE.getValue().equals(grantType)) {
             return null;
         }
-        String code = request.getParameter(WechatMiniProgramConstants.JS_CODE);
+        String code = request.getParameter(WechatMiniProgramConstants.CODE);
         String appId = request.getParameter(WechatMiniProgramConstants.APPID);
     
         if (!StringUtils.hasText(code)) {
@@ -51,7 +51,7 @@ public class MiniProgramAuthorizationConverter implements AuthenticationConverte
     
         Map<String, Object> additionalParameters = new HashMap();
         parameters.forEach((key, value) -> {
-            if (!key.equals(WechatMiniProgramConstants.JS_CODE) && !key.equals(Constants.SCOPE_KEY) && !key.equals(WechatMiniProgramConstants.APPID)) {
+            if (!key.equals(WechatMiniProgramConstants.CODE) && !key.equals(Constants.SCOPE_KEY) && !key.equals(WechatMiniProgramConstants.APPID)) {
                 additionalParameters.put(key, value.get(0));
             }
         

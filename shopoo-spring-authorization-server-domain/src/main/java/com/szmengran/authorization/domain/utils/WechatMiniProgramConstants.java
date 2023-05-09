@@ -29,7 +29,7 @@ public interface WechatMiniProgramConstants {
      *
      * @see OAuth2ParameterNames#CODE
      */
-    public static final String JS_CODE = "js_code";
+    public static final String CODE = "code";
     
     /**
      * 用户唯一标识
