@@ -27,13 +27,6 @@ public class MiniProgramAuthorizationToken extends AbstractAuthenticationToken {
     
     public static final AuthorizationGrantType GRANT_TYPE = new AuthorizationGrantType("wechat_mini_program");
     
-    
-    /**
-     * AppID(小程序ID)
-     */
-    @Getter
-    private final String appId;
-    
     /**
      * @see <a href=
      * "https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html">登录
@@ -43,15 +36,18 @@ public class MiniProgramAuthorizationToken extends AbstractAuthenticationToken {
     private final String code;
     
     @Getter
+    private final Authentication clientPrincipal;
+    
+    @Getter
     private final Set<String> scopes;
     private final Map<String, Object> additionalParameters;
     
-    public MiniProgramAuthorizationToken(String appId, String code, Set<String> scopes, Map<String, Object> additionalParameters) {
+    public MiniProgramAuthorizationToken(Authentication clientPrincipal, String code, Set<String> scopes, Map<String, Object> additionalParameters) {
         super(Collections.emptyList());
-        Assert.notNull(appId, "appId cannot be null");
+        Assert.notNull(clientPrincipal, "clientPrincipal cannot be null");
         Assert.notNull(code, "wechat authorization_code cannot be null");
         Assert.notNull(additionalParameters, "additionalParameters cannot be null");
-        this.appId = appId;
+        this.clientPrincipal = clientPrincipal;
         this.code = code;
         this.scopes = scopes;
         this.additionalParameters = additionalParameters;
@@ -68,6 +64,6 @@ public class MiniProgramAuthorizationToken extends AbstractAuthenticationToken {
     
     @Override
     public Object getPrincipal() {
-        return null;
+        return this.clientPrincipal;
     }
 }

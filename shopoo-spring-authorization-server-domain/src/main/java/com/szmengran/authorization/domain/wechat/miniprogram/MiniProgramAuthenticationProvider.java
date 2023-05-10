@@ -47,15 +47,15 @@ public class MiniProgramAuthenticationProvider implements AuthenticationProvider
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         MiniProgramAuthorizationToken miniProgramAuthorizationToken = (MiniProgramAuthorizationToken) authentication;
-        String appId = miniProgramAuthorizationToken.getAppId();
+        OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils.getAuthenticatedClientElseThrowInvalidClient(miniProgramAuthorizationToken);
+        RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
+        String appId = registeredClient.getClientId();
         Assert.notNull(appId, "appId cannot be null");
         String secret = wechatProperties.getMiniProgram().getMap().get(appId);
         Assert.notNull(secret, String.format("can't found secret(appId: %s) from map", appId));
         WechatMiniProgramQuery wechatMiniProgramQuery = WechatMiniProgramQuery.builder().appId(appId).secret(secret).jsCode(miniProgramAuthorizationToken.getCode()).grantType("authorization_code").build();
         miniProgramRepository.login(wechatMiniProgramQuery);
     
-        OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils.getAuthenticatedClientElseThrowInvalidClient(miniProgramAuthorizationToken);
-        RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
         Set<String> scopes = Optional.ofNullable(miniProgramAuthorizationToken.getScopes()).orElse(registeredClient.getScopes());
         DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder().registeredClient(registeredClient).principal(miniProgramAuthorizationToken).authorizationServerContext(AuthorizationServerContextHolder.getContext()).authorizedScopes(scopes).authorizationGrantType(MiniProgramAuthorizationToken.GRANT_TYPE);
         OAuth2TokenContext tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.ACCESS_TOKEN).build();
