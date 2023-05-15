@@ -8,6 +8,10 @@ import com.szmengran.authorization.dto.cqe.WechatMiniProgramQuery;
 import com.szmengran.cola.dto.SingleResponse;
 import com.szmengran.cola.exception.SysException;
 import org.apache.dubbo.config.annotation.DubboReference;
+
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 
 /**

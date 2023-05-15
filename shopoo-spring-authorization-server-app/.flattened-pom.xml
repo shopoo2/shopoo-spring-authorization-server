@@ -35,7 +35,7 @@
     <dependency>
       <groupId>com.szmengran.cola</groupId>
       <artifactId>cola-component-catchlog-starter</artifactId>
-      <version>3.0.4</version>
+      <version>3.0.6</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
