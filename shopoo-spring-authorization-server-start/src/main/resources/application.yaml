@@ -1,10 +1,10 @@
 server:
-  port: 8088
+  port: 8902
 spring:
   profiles:
     active: ${ENVIRONMENT:dev}
   application:
-    name: shopoo-spring-authorization-server-start
+    name: shopoo-spring-authorization-server
   cloud:
     nacos:
       username: ${NACOS_USERNAME}
@@ -20,4 +20,5 @@ spring:
       - nacos:knife4j.yaml
       - nacos:wechat.yaml
       - nacos:common-dubbo.yaml
-      - nacos:shopoo-spring-authorization-server-start.yaml
+      - nacos:common-oauth2-resource-server.yaml
+      - nacos:shopoo-spring-authorization-server.yaml

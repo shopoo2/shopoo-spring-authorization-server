@@ -11,12 +11,12 @@
     <artifactId>shopoo-spring-authorization-server-start</artifactId>
     <packaging>jar</packaging>
     <name>shopoo-spring-authorization-server-start</name>
+    
     <dependencies>
         <dependency>
             <groupId>com.szmengran</groupId>
             <artifactId>shopoo-spring-authorization-server-adapter</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -30,7 +30,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo-spring-boot-starter</artifactId>
@@ -39,8 +38,16 @@
             <groupId>com.alibaba.nacos</groupId>
             <artifactId>nacos-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.szmengran.cola</groupId>
+            <artifactId>cola-component-base</artifactId>
+        </dependency>
     </dependencies>
     
+    <properties>
+        <aliyunUsername>${env.ALIYUN_USERNAME}</aliyunUsername>
+        <aliyunPassword>${env.ALIYUN_PASSWORD}</aliyunPassword>
+    </properties>
     
     <build>
         <pluginManagement>
@@ -51,16 +58,16 @@
                     <version>3.3.1</version>
                     <configuration>
                         <from>
-                            <image>openjdk:17.0.2</image>
+                            <image>registry.cn-guangzhou.aliyuncs.com/szmengran/openjdk:17.0.2</image>
                         </from>
                         <to>
-                            <image>registry.cn-guangzhou.aliyuncs.com/szmengran/authorization</image>
+                            <image>registry.cn-guangzhou.aliyuncs.com/szmengran/shopoo-spring-authorization-server</image>
                             <tags>
                                 <tag>${project.version}</tag>
                             </tags>
                             <auth>
-                                <username></username>
-                                <password></password>
+                                <username>${aliyunUsername}</username>
+                                <password>${aliyunPassword}</password>
                             </auth>
                         </to>
                         <container>
@@ -70,7 +77,7 @@
                                 <jvmFlag>-Xmx512m</jvmFlag>
                             </jvmFlags>
                             <ports>
-                                <port>8080</port>
+                                <port>8902</port>
                             </ports>
                             <mainClass>com.szmengran.authorization.Application</mainClass>
                         </container>

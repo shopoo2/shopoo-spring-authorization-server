@@ -8,6 +8,8 @@ import com.nimbusds.jose.proc.SecurityContext;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -58,11 +60,13 @@ public class JwtConfig {
 	}
 	
 	@Bean
+	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
 		return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
 	}
 	
 	@Bean
+	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public PasswordEncoder passwordEncoder() {
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 	}
