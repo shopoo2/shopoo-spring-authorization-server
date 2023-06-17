@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * @since 2020-05-23 16:41:57
  */
 @Data
-public class OauthRole implements Serializable {
+public class Oauth2Role implements Serializable {
     private static final long serialVersionUID = 617956533073032925L;
     /**
      * 角色主键

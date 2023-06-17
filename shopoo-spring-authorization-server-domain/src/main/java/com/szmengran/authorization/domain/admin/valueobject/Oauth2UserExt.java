@@ -1,6 +1,6 @@
 package com.szmengran.authorization.domain.admin.valueobject;
 
-import com.szmengran.authorization.domain.admin.entity.OauthUser;
+import com.szmengran.authorization.domain.admin.entity.Oauth2User;
 import lombok.Data;
 
 /**
@@ -9,7 +9,7 @@ import lombok.Data;
  * @Version 1.0
  */
 @Data
-public class OauthUserExt extends OauthUser {
+public class Oauth2UserExt extends Oauth2User {
     
     /**
      * 角色主键

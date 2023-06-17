@@ -1,6 +1,8 @@
 package com.szmengran.authorization.infrastructure.admin.repository;
 
-import com.szmengran.authorization.domain.admin.valueobject.OauthRoleExt;
+import com.szmengran.authorization.domain.admin.entity.Oauth2User;
+import com.szmengran.authorization.domain.admin.repository.UserRepository;
+import com.szmengran.authorization.domain.admin.valueobject.Oauth2RoleExt;
 import com.szmengran.authorization.domain.admin.valueobject.UserDetailsExt;
 import com.szmengran.authorization.infrastructure.admin.database.RoleMapper;
 import com.szmengran.authorization.infrastructure.admin.database.UserMapper;
@@ -20,7 +22,7 @@ import java.util.List;
  * @Author <a href="mailto:android_li@sina.cn">Joe</a>
  **/
 @Repository
-public class UserRepositoryImpl implements UserDetailsService {
+public class UserRepositoryImpl implements UserDetailsService, UserRepository {
 
     @Resource
     private UserMapper userMapper;
@@ -35,8 +37,18 @@ public class UserRepositoryImpl implements UserDetailsService {
         if (user.getStatus() != 1) {
             throw new BizException("用户已被禁用，请联系平台管理员");
         }
-        List<OauthRoleExt> roles = roleMapper.findByUserId(user.getUserId());
+        List<Oauth2RoleExt> roles = roleMapper.findByUserId(user.getUserId());
         user.setAuthorities(roles);
         return user;
+    }
+
+    @Override
+    public void add(Oauth2User oauth2User) {
+        userMapper.insert(oauth2User);
+    }
+
+    @Override
+    public Integer update(Oauth2User oauth2User) {
+        return userMapper.updateById(oauth2User);
     }
 }

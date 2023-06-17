@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * @since 2021-03-12 14:36:39
  */
 @Data
-public class OauthMenu implements Serializable {
+public class Oauth2Menu implements Serializable {
     private static final long serialVersionUID = -61107333405120393L;
     /**
      * 菜单ID

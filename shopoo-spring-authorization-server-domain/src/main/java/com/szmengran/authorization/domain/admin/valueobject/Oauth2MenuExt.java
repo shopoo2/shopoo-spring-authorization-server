@@ -1,6 +1,6 @@
 package com.szmengran.authorization.domain.admin.valueobject;
 
-import com.szmengran.authorization.domain.admin.entity.OauthMenu;
+import com.szmengran.authorization.domain.admin.entity.Oauth2Menu;
 import lombok.Data;
 
 /**
@@ -9,7 +9,7 @@ import lombok.Data;
  * @Version 1.0
  */
 @Data
-public class OauthMenuExt extends OauthMenu {
+public class Oauth2MenuExt extends Oauth2Menu {
     
     /**
      * 角色ID

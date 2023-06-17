@@ -28,9 +28,9 @@ public class UserDetailsExt implements UserDetails, Serializable {
     private Short status;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public void setAuthorities(List<OauthRoleExt> roles) {
+    public void setAuthorities(List<Oauth2RoleExt> roles) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        for (OauthRoleExt role : roles) {
+        for (Oauth2RoleExt role : roles) {
             String name = role.getName().toUpperCase();
             authorities.add(new SimpleGrantedAuthority(name));
         }

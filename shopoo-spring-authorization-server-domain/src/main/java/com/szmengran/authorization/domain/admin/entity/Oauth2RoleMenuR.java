@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @since 2021-05-12 10:29:24
  */
 @Data
-public class OauthRoleMenuR implements Serializable {
+public class Oauth2RoleMenuR implements Serializable {
     private static final long serialVersionUID = 648989955208978407L;
     /**
      * 菜单表_菜单ID

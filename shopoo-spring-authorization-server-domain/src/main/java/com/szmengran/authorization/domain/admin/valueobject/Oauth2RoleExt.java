@@ -1,6 +1,6 @@
 package com.szmengran.authorization.domain.admin.valueobject;
 
-import com.szmengran.authorization.domain.admin.entity.OauthRole;
+import com.szmengran.authorization.domain.admin.entity.Oauth2Role;
 import lombok.Data;
 
 /**
@@ -9,7 +9,7 @@ import lombok.Data;
  * @Version 1.0
  */
 @Data
-public class OauthRoleExt extends OauthRole {
+public class Oauth2RoleExt extends Oauth2Role {
     /**
      * 用户ID
      */

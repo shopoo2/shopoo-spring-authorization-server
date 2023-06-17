@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @since 2021-03-12 14:36:46
  */
 @Data
-public class OauthUserRoleR implements Serializable {
+public class Oauth2UserRoleR implements Serializable {
     private static final long serialVersionUID = -58448603267079691L;
     /**
      * 角色主键
