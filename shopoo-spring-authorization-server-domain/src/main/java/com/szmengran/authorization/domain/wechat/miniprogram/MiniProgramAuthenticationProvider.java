@@ -1,12 +1,24 @@
 package com.szmengran.authorization.domain.wechat.miniprogram;
 
+import com.shopoo.wechat.dto.clientobject.LoginInfoCO;
+import com.szmengran.authorization.domain.admin.entity.Oauth2Wechat;
+import com.szmengran.authorization.domain.admin.repository.UserRepository;
+import com.szmengran.authorization.domain.admin.repository.WechatRepository;
+import com.szmengran.authorization.domain.admin.valueobject.UserDetailsExt;
+import com.szmengran.authorization.domain.utils.IDUtils;
 import com.szmengran.authorization.domain.utils.OAuth2AuthenticationProviderUtils;
 import com.szmengran.authorization.domain.wechat.config.WechatProperties;
 import com.szmengran.authorization.domain.wechat.repository.MiniProgramRepository;
 import com.szmengran.authorization.dto.cqe.WechatMiniProgramQuery;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType;
 import org.springframework.security.oauth2.core.OAuth2Token;
@@ -20,6 +32,7 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.util.Assert;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -29,19 +42,31 @@ import java.util.Set;
  * @Date 2023/4/19 19:36
  * @Version 1.0
  */
-public class MiniProgramAuthenticationProvider implements AuthenticationProvider {
+public class MiniProgramAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
     
     private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
     private final WechatProperties wechatProperties;
+    private final UserDetailsService userDetailsService;
     private final MiniProgramRepository miniProgramRepository;
     
-    public MiniProgramAuthenticationProvider(WechatProperties wechatProperties, MiniProgramRepository miniProgramRepository, OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator) {
+    private final WechatRepository wechatRepository;
+    
+    public MiniProgramAuthenticationProvider(WechatRepository wechatRepository, UserDetailsService userDetailsService, WechatProperties wechatProperties, MiniProgramRepository miniProgramRepository, OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator) {
+        Assert.notNull(wechatRepository, "wechatRepository cannot be null");
+        Assert.notNull(userDetailsService, "userDetailsService cannot be null");
         Assert.notNull(wechatProperties, "wechatProperties cannot be null");
         Assert.notNull(miniProgramRepository, "miniProgramRepository cannot be null");
         Assert.notNull(tokenGenerator, "tokenGenerator cannot be null");
+        this.wechatRepository = wechatRepository;
+        this.userDetailsService = userDetailsService;
         this.wechatProperties = wechatProperties;
         this.miniProgramRepository = miniProgramRepository;
         this.tokenGenerator = tokenGenerator;
+    }
+    
+    @Override
+    protected void additionalAuthenticationChecks(final UserDetails userDetails, final UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+    
     }
     
     @Override
@@ -49,19 +74,58 @@ public class MiniProgramAuthenticationProvider implements AuthenticationProvider
         MiniProgramAuthorizationToken miniProgramAuthorizationToken = (MiniProgramAuthorizationToken) authentication;
         OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils.getAuthenticatedClientElseThrowInvalidClient(miniProgramAuthorizationToken);
         RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
-        String appId = registeredClient.getClientId();
-        Assert.notNull(appId, "appId cannot be null");
-        String secret = wechatProperties.getMiniProgram().getMap().get(appId);
-        Assert.notNull(secret, String.format("can't found secret(appId: %s) from map", appId));
-        WechatMiniProgramQuery wechatMiniProgramQuery = WechatMiniProgramQuery.builder().appId(appId).secret(secret).jsCode(miniProgramAuthorizationToken.getCode()).grantType("authorization_code").build();
-        miniProgramRepository.login(wechatMiniProgramQuery);
-    
+        
+        checkAndRegister(registeredClient, miniProgramAuthorizationToken.getCode());
+        
         Set<String> scopes = Optional.ofNullable(miniProgramAuthorizationToken.getScopes()).orElse(registeredClient.getScopes());
         DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder().registeredClient(registeredClient).principal(miniProgramAuthorizationToken).authorizationServerContext(AuthorizationServerContextHolder.getContext()).authorizedScopes(scopes).authorizationGrantType(MiniProgramAuthorizationToken.GRANT_TYPE);
         OAuth2TokenContext tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.ACCESS_TOKEN).build();
         OAuth2Token generatedAccessToken = this.tokenGenerator.generate(tokenContext);
         OAuth2AccessToken accessToken = new OAuth2AccessToken(TokenType.BEARER, generatedAccessToken.getTokenValue(), generatedAccessToken.getIssuedAt(), generatedAccessToken.getExpiresAt(), tokenContext.getAuthorizedScopes());
         return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal, accessToken, null, Collections.emptyMap());
+    }
+    
+    private void checkAndRegister(RegisteredClient registeredClient, String code) {
+        String appId = registeredClient.getClientId();
+        Assert.notNull(appId, "appId cannot be null");
+        String secret = wechatProperties.getMiniProgram().getMap().get(appId);
+        Assert.notNull(secret, String.format("can't found secret(appId: %s) from map", appId));
+        WechatMiniProgramQuery wechatMiniProgramQuery = WechatMiniProgramQuery.builder().appId(appId).secret(secret).jsCode(code).grantType("authorization_code").build();
+        LoginInfoCO loginInfoCO = miniProgramRepository.login(wechatMiniProgramQuery);
+        UserDetailsExt loadedUser = (UserDetailsExt) userDetailsService.loadUserByUsername(loginInfoCO.getOpenid());
+        if (loadedUser == null) {
+            Oauth2Wechat oauth2Wechat = new Oauth2Wechat();
+            String id = IDUtils.getSnowId("");
+            oauth2Wechat.setUserId(id);
+            oauth2Wechat.setOpenid(loginInfoCO.getOpenid());
+            oauth2Wechat.setUnionid(loginInfoCO.getUnionid());
+            wechatRepository.add(oauth2Wechat);
+            loadedUser = new UserDetailsExt();
+            loadedUser.setUserId(id);
+        }
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken.unauthenticated(loginInfoCO.getOpenid(), null);
+        super.createSuccessAuthentication(loadedUser.getUserId(), usernamePasswordAuthenticationToken, loadedUser);
+    
+    }
+    @Override
+    protected UserDetails retrieveUser(final String username, final UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+        try {
+            UserDetails loadedUser = userDetailsService.loadUserByUsername(username);
+            if (loadedUser == null) {
+                throw new InternalAuthenticationServiceException(
+                        "UserDetailsService returned null, which is an interface contract violation");
+            }
+            return loadedUser;
+        }
+        catch (UsernameNotFoundException ex) {
+            throw ex;
+        }
+        catch (InternalAuthenticationServiceException ex) {
+            throw ex;
+        }
+        catch (Exception ex) {
+            throw new InternalAuthenticationServiceException(ex.getMessage(), ex);
+        }
     }
     
     @Override

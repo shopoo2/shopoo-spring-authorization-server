@@ -4,12 +4,14 @@ import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * Spring Boot Starter
  *
  * @author Frank Zhang
  */
+@EnableAsync
 @EnableDubbo
 @EnableFeignClients(basePackages = {"com.szmengran.authorization.infrastructure.wechat.client"})
 @SpringBootApplication(scanBasePackages = {"com.szmengran.authorization", "com.alibaba.cola"})

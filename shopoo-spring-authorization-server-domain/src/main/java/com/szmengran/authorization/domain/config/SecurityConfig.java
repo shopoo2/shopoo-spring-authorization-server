@@ -1,5 +1,6 @@
 package com.szmengran.authorization.domain.config;
 
+import com.szmengran.authorization.domain.admin.repository.WechatRepository;
 import com.szmengran.authorization.domain.password.UsernamePasswordAuthenticationProvider;
 import com.szmengran.authorization.domain.password.UsernamePasswordAuthorizationConverter;
 import com.szmengran.authorization.domain.wechat.config.WechatProperties;
@@ -7,6 +8,7 @@ import com.szmengran.authorization.domain.wechat.miniprogram.MiniProgramAuthenti
 import com.szmengran.authorization.domain.wechat.miniprogram.MiniProgramAuthorizationConverter;
 import com.szmengran.authorization.domain.wechat.repository.MiniProgramRepository;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -42,7 +44,15 @@ public class SecurityConfig {
     private JwtDecoder jwtDecoder;
     
     @Resource
+    @Qualifier("userDetailsService")
     private UserDetailsService userDetailsService;
+    
+    @Resource
+    @Qualifier("wechatDetailsService")
+    private UserDetailsService wechatDetailsService;
+    
+    @Resource
+    private WechatRepository wechatRepository;
     
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -75,7 +85,7 @@ public class SecurityConfig {
                                 .accessTokenRequestConverter(new UsernamePasswordAuthorizationConverter())
                                 .accessTokenRequestConverter(new MiniProgramAuthorizationConverter())
                                 .authenticationProvider(new UsernamePasswordAuthenticationProvider(passwordEncoder, userDetailsService, authorizationService, tokenGenerator))
-                                .authenticationProvider(new MiniProgramAuthenticationProvider(wechatProperties, miniProgramRepository, tokenGenerator))
+                                .authenticationProvider(new MiniProgramAuthenticationProvider(wechatRepository, wechatDetailsService, wechatProperties, miniProgramRepository, tokenGenerator))
         );
         
         return http.build();

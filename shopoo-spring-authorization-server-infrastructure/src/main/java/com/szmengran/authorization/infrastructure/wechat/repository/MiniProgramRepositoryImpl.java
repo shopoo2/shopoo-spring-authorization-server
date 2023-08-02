@@ -9,6 +9,7 @@ import com.szmengran.authorization.infrastructure.wechat.client.MiniProgramClien
 import com.szmengran.cola.exception.SysException;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -33,6 +34,7 @@ public class MiniProgramRepositoryImpl implements MiniProgramRepository {
         if (null != loginInfoCO && loginInfoCO.getErrcode() != null) {
             throw new SysException(loginInfoCO.getErrcode().toString(), loginInfoCO.getErrmsg());
         }
+        
         return loginInfoCO;
     }
 }
