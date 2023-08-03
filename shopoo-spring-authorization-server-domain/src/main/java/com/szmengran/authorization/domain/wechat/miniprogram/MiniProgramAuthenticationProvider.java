@@ -1,18 +1,14 @@
 package com.szmengran.authorization.domain.wechat.miniprogram;
 
 import com.shopoo.wechat.dto.clientobject.LoginInfoCO;
-import com.szmengran.authorization.domain.admin.converter.Converter;
 import com.szmengran.authorization.domain.admin.entity.Oauth2Wechat;
-import com.szmengran.authorization.domain.admin.repository.UserRepository;
 import com.szmengran.authorization.domain.admin.repository.WechatRepository;
 import com.szmengran.authorization.domain.admin.valueobject.UserDetailsExt;
 import com.szmengran.authorization.domain.utils.IDUtils;
 import com.szmengran.authorization.domain.utils.OAuth2AuthenticationProviderUtils;
 import com.szmengran.authorization.domain.wechat.config.WechatProperties;
 import com.szmengran.authorization.domain.wechat.repository.MiniProgramRepository;
-import com.szmengran.authorization.dto.UserDetailsCO;
 import com.szmengran.authorization.dto.cqe.WechatMiniProgramQuery;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -34,7 +30,6 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.util.Assert;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
