@@ -81,8 +81,8 @@
               <tag>${project.version}</tag>
             </tags>
             <auth>
-              <username>${aliyunUsername}</username>
-              <password>${aliyunPassword}</password>
+              <username>szmengran@sina.cn</username>
+              <password>Li542184118123@</password>
             </auth>
           </to>
           <container>

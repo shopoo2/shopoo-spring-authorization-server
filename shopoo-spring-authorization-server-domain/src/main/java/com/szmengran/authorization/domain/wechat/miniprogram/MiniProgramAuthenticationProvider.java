@@ -1,6 +1,7 @@
 package com.szmengran.authorization.domain.wechat.miniprogram;
 
 import com.shopoo.wechat.dto.clientobject.LoginInfoCO;
+import com.szmengran.authorization.domain.admin.converter.Converter;
 import com.szmengran.authorization.domain.admin.entity.Oauth2Wechat;
 import com.szmengran.authorization.domain.admin.repository.UserRepository;
 import com.szmengran.authorization.domain.admin.repository.WechatRepository;
@@ -9,6 +10,7 @@ import com.szmengran.authorization.domain.utils.IDUtils;
 import com.szmengran.authorization.domain.utils.OAuth2AuthenticationProviderUtils;
 import com.szmengran.authorization.domain.wechat.config.WechatProperties;
 import com.szmengran.authorization.domain.wechat.repository.MiniProgramRepository;
+import com.szmengran.authorization.dto.UserDetailsCO;
 import com.szmengran.authorization.dto.cqe.WechatMiniProgramQuery;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -47,6 +49,7 @@ public class MiniProgramAuthenticationProvider extends AbstractUserDetailsAuthen
     private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
     private final WechatProperties wechatProperties;
     private final UserDetailsService userDetailsService;
+    
     private final MiniProgramRepository miniProgramRepository;
     
     private final WechatRepository wechatRepository;
@@ -74,18 +77,18 @@ public class MiniProgramAuthenticationProvider extends AbstractUserDetailsAuthen
         MiniProgramAuthorizationToken miniProgramAuthorizationToken = (MiniProgramAuthorizationToken) authentication;
         OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils.getAuthenticatedClientElseThrowInvalidClient(miniProgramAuthorizationToken);
         RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
-        
-        checkAndRegister(registeredClient, miniProgramAuthorizationToken.getCode());
-        
+    
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = checkAndRegister(registeredClient, miniProgramAuthorizationToken.getCode());
+    
         Set<String> scopes = Optional.ofNullable(miniProgramAuthorizationToken.getScopes()).orElse(registeredClient.getScopes());
-        DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder().registeredClient(registeredClient).principal(miniProgramAuthorizationToken).authorizationServerContext(AuthorizationServerContextHolder.getContext()).authorizedScopes(scopes).authorizationGrantType(MiniProgramAuthorizationToken.GRANT_TYPE);
+        DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder().registeredClient(registeredClient).principal(usernamePasswordAuthenticationToken).authorizationServerContext(AuthorizationServerContextHolder.getContext()).authorizedScopes(scopes).authorizationGrantType(MiniProgramAuthorizationToken.GRANT_TYPE);
         OAuth2TokenContext tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.ACCESS_TOKEN).build();
         OAuth2Token generatedAccessToken = this.tokenGenerator.generate(tokenContext);
         OAuth2AccessToken accessToken = new OAuth2AccessToken(TokenType.BEARER, generatedAccessToken.getTokenValue(), generatedAccessToken.getIssuedAt(), generatedAccessToken.getExpiresAt(), tokenContext.getAuthorizedScopes());
         return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal, accessToken, null, Collections.emptyMap());
     }
     
-    private void checkAndRegister(RegisteredClient registeredClient, String code) {
+    private UsernamePasswordAuthenticationToken checkAndRegister(RegisteredClient registeredClient, String code) {
         String appId = registeredClient.getClientId();
         Assert.notNull(appId, "appId cannot be null");
         String secret = wechatProperties.getMiniProgram().getMap().get(appId);
@@ -102,9 +105,11 @@ public class MiniProgramAuthenticationProvider extends AbstractUserDetailsAuthen
             wechatRepository.add(oauth2Wechat);
             loadedUser = new UserDetailsExt();
             loadedUser.setUserId(id);
+            loadedUser.setUsername(loginInfoCO.getUnionid());
         }
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken.unauthenticated(loginInfoCO.getOpenid(), null);
-        super.createSuccessAuthentication(loadedUser.getUserId(), usernamePasswordAuthenticationToken, loadedUser);
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken.unauthenticated(loginInfoCO.getUnionid(), null);
+        super.createSuccessAuthentication(loginInfoCO.getUnionid(), usernamePasswordAuthenticationToken, loadedUser);
+        return usernamePasswordAuthenticationToken;
     
     }
     @Override
