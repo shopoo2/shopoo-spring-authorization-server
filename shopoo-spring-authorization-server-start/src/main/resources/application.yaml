@@ -19,6 +19,7 @@ spring:
     import:
       - nacos:knife4j.yaml
       - nacos:wechat.yaml
+      - nacos:common.yaml
       - nacos:common-dubbo.yaml
       - nacos:common-oauth2-resource-server.yaml
       - nacos:shopoo-spring-authorization-server.yaml

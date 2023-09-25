@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @EnableAsync
 @EnableDubbo
-@EnableFeignClients(basePackages = {"com.szmengran.authorization.infrastructure.wechat.client"})
+@EnableFeignClients(basePackages = {"com.szmengran.authorization.infrastructure.wechat.client", "com.szmengran.authorization.infrastructure.oauth2.client"})
 @SpringBootApplication(scanBasePackages = {"com.szmengran.authorization", "com.alibaba.cola"})
 public class Application {
 
