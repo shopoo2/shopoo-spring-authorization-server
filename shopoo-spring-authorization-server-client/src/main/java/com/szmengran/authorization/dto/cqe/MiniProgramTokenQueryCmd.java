@@ -37,10 +37,8 @@ public class MiniProgramTokenQueryCmd extends Query {
 	private String scope;
 
 	@Schema(description = "客户端ID")
-	@NotNull(message = "客户端ID不能为空")
 	private String clientId;
 
 	@Schema(description = "客户端密钥")
-	@NotNull(message = "客户端密钥不能为空")
 	private String clientSecret;
 }
