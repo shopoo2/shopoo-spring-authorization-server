@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "${spring.application.name}")
+@FeignClient(name = "${spring.application.name}", url = "localhost:${server.port}")
 public interface Oauth2Client {
 
 	@PostMapping(value = Constants.OAUTH2_URL, produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
