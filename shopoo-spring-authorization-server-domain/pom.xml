@@ -69,8 +69,8 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.shopoo.wechat</groupId>
-            <artifactId>shopoo-wechat-client</artifactId>
+            <groupId>com.shopoo.common</groupId>
+            <artifactId>shopoo-common-client</artifactId>
         </dependency>
     
         <dependency>

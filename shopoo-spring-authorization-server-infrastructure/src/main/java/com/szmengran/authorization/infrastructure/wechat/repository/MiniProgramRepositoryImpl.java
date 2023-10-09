@@ -2,9 +2,10 @@ package com.szmengran.authorization.infrastructure.wechat.repository;
 
 import java.util.concurrent.TimeUnit;
 
-import com.shopoo.wechat.api.WechatFacade;
-import com.shopoo.wechat.dto.clientobject.LoginInfoCO;
-import com.shopoo.wechat.dto.cqe.LoginCmd;
+import com.google.gson.Gson;
+import com.shopoo.common.wechat.api.WechatFacade;
+import com.shopoo.common.wechat.dto.clientobject.LoginInfoCO;
+import com.shopoo.common.wechat.dto.cqe.LoginCmd;
 import com.szmengran.authorization.domain.wechat.repository.MiniProgramRepository;
 import com.szmengran.authorization.dto.cqe.WechatMiniProgramQuery;
 import com.szmengran.authorization.infrastructure.wechat.client.MiniProgramClient;
@@ -38,10 +39,11 @@ public class MiniProgramRepositoryImpl implements MiniProgramRepository {
     @Override
     public LoginInfoCO login(final WechatMiniProgramQuery wechatMiniProgramQuery) {
         LoginCmd loginCmd = LoginCmd.builder().appId(wechatMiniProgramQuery.getAppId()).appSecret(wechatMiniProgramQuery.getSecret()).code(wechatMiniProgramQuery.getJsCode()).build();
-        SingleResponse<LoginInfoCO> response = wechatFacade.getLoginInfo(loginCmd);
-        Assert.isTrue(response.isSuccess(), response.getErrMessage());
-        LoginInfoCO loginInfoCO = response.getData();
-        redisTemplate.opsForValue().set(wechatMiniProgramQuery.getJsCode(), loginInfoCO, 60*5, TimeUnit.SECONDS);
+        log.info("wechat login request：{}", loginCmd);
+        String json = miniProgramClient.getLoginInfo(loginCmd.getAppId(), loginCmd.getAppSecret(), loginCmd.getCode());
+        log.info("wechat login response：{}", json);
+        LoginInfoCO loginInfoCO = new Gson().fromJson(json, LoginInfoCO.class);
+        redisTemplate.opsForValue().set(wechatMiniProgramQuery.getJsCode(), loginInfoCO, 60, TimeUnit.SECONDS);
         return loginInfoCO;
     }
 }

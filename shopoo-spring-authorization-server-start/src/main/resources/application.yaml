@@ -21,5 +21,6 @@ spring:
       - nacos:wechat.yaml
       - nacos:common.yaml
       - nacos:common-dubbo.yaml
+      - nacos:common-redis.yaml
       - nacos:common-oauth2-resource-server.yaml
       - nacos:shopoo-spring-authorization-server.yaml

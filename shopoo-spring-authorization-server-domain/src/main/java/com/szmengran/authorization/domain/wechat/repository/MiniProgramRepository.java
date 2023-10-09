@@ -1,7 +1,6 @@
 package com.szmengran.authorization.domain.wechat.repository;
 
-import com.shopoo.wechat.dto.clientobject.LoginInfoCO;
-import com.szmengran.authorization.dto.WechatMiniProgramCO;
+import com.shopoo.common.wechat.dto.clientobject.LoginInfoCO;
 import com.szmengran.authorization.dto.cqe.WechatMiniProgramQuery;
 
 /**

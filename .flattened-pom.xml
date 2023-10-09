@@ -64,8 +64,8 @@
         <version>5.8.3</version>
       </dependency>
       <dependency>
-        <groupId>com.shopoo.wechat</groupId>
-        <artifactId>shopoo-wechat-client</artifactId>
+        <groupId>com.shopoo.common</groupId>
+        <artifactId>shopoo-common-client</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
